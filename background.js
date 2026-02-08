@@ -1,46 +1,54 @@
+// State management
 let hasShownBreakAlert = false;
+let lastUrl = location.href;
+
+// Configuration
+const CONFIG = {
+  userSubscriptions: "https://www.youtube.com/feed/subscriptions",
+  scrollThreshold: 200,
+  gridItemsPerRow: 2,
+  gridItemMaxWidth: '550px'
+};
+
+const ALLOWED_PATHS = [
+  'https://www.youtube.com/watch',
+  'https://www.youtube.com/account',
+  'https://www.youtube.com/reporthistory',
+  'https://www.youtube.com/paid_memberships?',
+  'https://www.youtube.com/feed/playlist',
+  'https://www.youtube.com/feed/history',
+  'https://www.youtube.com/feed/you',
+  'https://www.youtube.com/results?',
+  'https://www.youtube.com/feed/channels',
+  'https://www.youtube.com/@',
+  'https://www.youtube.com/feed/downloads',
+  'https://www.youtube.com/playlist?list=WL',
+  'https://www.youtube.com/playlist?list=LL',
+  CONFIG.userSubscriptions
+];
 
 // Check for URLs that do not connect to the user's subscriptions feed and redirect them accordingly. This is to prevent users from getting distracted by other content they might not want to see.
 function checkAndRedirect() {
-  const userSubscriptions = "https://www.youtube.com/feed/subscriptions";
-  
-  // URLs that are allowed (won't redirect)
-  const allowedPaths = [
-    'https://www.youtube.com/watch',
-    'https://www.youtube.com/account',
-    'https://www.youtube.com/reporthistory',
-    'https://www.youtube.com/paid_memberships?',
-    'https://www.youtube.com/feed/playlist',
-    'https://www.youtube.com/feed/history',
-    'https://www.youtube.com/feed/you',
-    'https://www.youtube.com/results?',
-    'https://www.youtube.com/feed/channels',
-    'https://www.youtube.com/@',
-    'https://www.youtube.com/feed/downloads',
-    'https://www.youtube.com/playlist?list=WL',
-    'https://www.youtube.com/playlist?list=LL',
-    userSubscriptions
-  ];
-  
   const currentUrl = window.location.href;
-  const isAllowed = allowedPaths.some(path => currentUrl.startsWith(path));
+  const isAllowed = ALLOWED_PATHS.some(path => currentUrl.startsWith(path));
 
   if (window.location.hostname === "www.youtube.com" && !isAllowed) {
-    window.location.href = userSubscriptions;
+    window.location.href = CONFIG.userSubscriptions;
   }
 }
 
 // A simple function that displays a page alert when the user has scrolled over 200 videos, notifies them to take a break and refreshes the page.
 function disableInfiniteScroll() {
   const displayedVideos = document.querySelectorAll('ytd-rich-item-renderer').length;
-  if (displayedVideos > 200 && !hasShownBreakAlert) {
+  
+  if (displayedVideos > CONFIG.scrollThreshold && !hasShownBreakAlert) {
     hasShownBreakAlert = true;
     // Disable scrolling on page and alert user it's time to take a break.
     document.body.style.overflow = 'hidden';
     alert("You've been scrolling for awhile! Now is a good time to take a break. \n\nYour feed will be refreshed once this popup is closed. ");
 
     // Redirect after alert is dismissed
-    window.location.href = "https://www.youtube.com/feed/subscriptions";
+    window.location.href = CONFIG.userSubscriptions;
   }
 }
 
@@ -103,41 +111,49 @@ function removeDomElements() {
   // Sets how many videos are displayed on one line and styles them accordingly in the browsing grind. 
   const gridElement = document.querySelector("#primary ytd-rich-grid-renderer");
   if (gridElement) {
-    gridElement.style.setProperty('--ytd-rich-grid-items-per-row', '2'); // Videos per row is set to 2, which reduces the overall amount of items shown to the viewer.
-    gridElement.style.setProperty('--ytd-rich-grid-item-max-width', '550px'); // Scale video thumbnais
+    gridElement.style.setProperty('--ytd-rich-grid-items-per-row', CONFIG.gridItemsPerRow.toString()); // Videos per row is set to 2, which reduces the overall amount of items shown to the viewer.
+    gridElement.style.setProperty('--ytd-rich-grid-item-max-width', CONFIG.gridItemMaxWidth); // Scale video thumbnais
   }
 }
 
-checkAndRedirect();
-
-let lastUrl = location.href;
-
-// A mutation observer that listens for changes in the DOM and checks if the URL has changed. If it has, the productivity and focus-encouraging commands are run.
-new MutationObserver(() => {
+// Handle URL changes and apply modifications
+function handleUrlChange() {
   const currentUrl = location.href;
   if (currentUrl !== lastUrl) {
     lastUrl = currentUrl;
     console.log("URL changed to:", currentUrl);
     checkAndRedirect();
-    disableInfiniteScroll();
   }
-
+  
   // Call modifying functions.
   removeDomElements();
-  disableInfiniteScroll()
-}).observe(document, {subtree: true, childList: true});
+  disableInfiniteScroll();
+}
 
-
-window.addEventListener('yt-navigate-finish', () => {
+// Initialize extension
+function initialize() {
   checkAndRedirect();
-  removeDomElements();
-});
-
-window.addEventListener('popstate', () => {
-  checkAndRedirect();
-  removeDomElements();
-});
-
-// Initial removal attempt
-removeDomElements();
   
+  // Initial removal attempt
+  removeDomElements();
+
+  // A mutation observer that listens for changes in the DOM and checks if the URL has changed. If it has, the productivity and focus-encouraging commands are run.
+  new MutationObserver(handleUrlChange).observe(document, {
+    subtree: true, 
+    childList: true
+  });
+
+  // Event listeners for YouTube navigation
+  window.addEventListener('yt-navigate-finish', () => {
+    checkAndRedirect();
+    removeDomElements();
+  });
+
+  window.addEventListener('popstate', () => {
+    checkAndRedirect();
+    removeDomElements();
+  });
+}
+
+// Start the extension
+initialize();
