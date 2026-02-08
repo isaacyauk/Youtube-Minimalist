@@ -1,5 +1,6 @@
 let hasShownBreakAlert = false;
 
+// Check for URLs that do not connect to the user's subscriptions feed and redirect them accordingly. This is to prevent users from getting distracted by other content they might not want to see.
 function checkAndRedirect() {
   const userSubscriptions = "https://www.youtube.com/feed/subscriptions";
   
@@ -29,6 +30,7 @@ function checkAndRedirect() {
   }
 }
 
+// A simple function that displays a page alert when the user has scrolled over 200 videos, notifies them to take a break and refreshes the page.
 function disableInfiniteScroll() {
   const displayedVideos = document.querySelectorAll('ytd-rich-item-renderer').length;
   if (displayedVideos > 200 && !hasShownBreakAlert) {
@@ -42,6 +44,7 @@ function disableInfiniteScroll() {
   }
 }
 
+// A method that removes various elements from the DOM using XPath queries.
 function removeDomElements() {
   // A helper method containing the standard payload formatting for sending an item to the DOM via XPath
   function removeByXPath(xpath) {
@@ -83,6 +86,10 @@ function removeDomElements() {
   // Removes the box containing "Home" and "Shorts" navagational elements from the overhead navbar
   removeByXPath("//a[contains(., 'Home')]/ancestor::ytd-guide-section-renderer");
 
+  // Removes the "Shorts" results field on the search page, as well as individual shorts from the search results.
+  removeByXPath("//span[contains(., 'Shorts')]/ancestor::ytd-item-section-renderer//grid-shelf-view-model");
+  removeByXPath("//div[contains(., 'SHORTS')]/ancestor::div[@id='dismissible']");
+
   // Removes the "Explore" box and its sub content from the sidebar
   removeByXPath("//a[contains(., 'Shopping')]/ancestor::ytd-guide-section-renderer");
 
@@ -93,11 +100,11 @@ function removeDomElements() {
   removeByXPath("//div[@id='columns']//div[@id='secondary']");
   removeByXPath("//ytd-comments");
 
-  // Sets how many videos are displayed on one line and styles them
+  // Sets how many videos are displayed on one line and styles them accordingly in the browsing grind. 
   const gridElement = document.querySelector("#primary ytd-rich-grid-renderer");
   if (gridElement) {
-    gridElement.style.setProperty('--ytd-rich-grid-items-per-row', '2');
-    gridElement.style.setProperty('--ytd-rich-grid-item-max-width', '550px');
+    gridElement.style.setProperty('--ytd-rich-grid-items-per-row', '2'); // Videos per row is set to 2, which reduces the overall amount of items shown to the viewer.
+    gridElement.style.setProperty('--ytd-rich-grid-item-max-width', '550px'); // Scale video thumbnais
   }
 }
 
@@ -105,6 +112,7 @@ checkAndRedirect();
 
 let lastUrl = location.href;
 
+// A mutation observer that listens for changes in the DOM and checks if the URL has changed. If it has, the productivity and focus-encouraging commands are run.
 new MutationObserver(() => {
   const currentUrl = location.href;
   if (currentUrl !== lastUrl) {
@@ -118,6 +126,7 @@ new MutationObserver(() => {
   removeDomElements();
   disableInfiniteScroll()
 }).observe(document, {subtree: true, childList: true});
+
 
 window.addEventListener('yt-navigate-finish', () => {
   checkAndRedirect();
