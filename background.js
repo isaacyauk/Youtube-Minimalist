@@ -1,8 +1,8 @@
-// State management
+// State management variables
 let hasShownBreakAlert = false;
 let lastUrl = location.href;
 
-// Configuration
+// Global variables that either are referenced a lot, or should be tweaked from ONE spot.
 const CONFIG = {
   userSubscriptions: "https://www.youtube.com/feed/subscriptions",
   scrollThreshold: 200,
@@ -32,6 +32,7 @@ function checkAndRedirect() {
   const currentUrl = window.location.href;
   const isAllowed = ALLOWED_PATHS.some(path => currentUrl.startsWith(path));
 
+  // Redirect the user if on YouTube.com and on a path that is not allowed in Minimalist mode.
   if (window.location.hostname === "www.youtube.com" && !isAllowed) {
     window.location.href = CONFIG.userSubscriptions;
   }
@@ -130,7 +131,7 @@ function handleUrlChange() {
   disableInfiniteScroll();
 }
 
-// Initialize extension
+// A function for extension initialization!
 function initialize() {
   checkAndRedirect();
   
