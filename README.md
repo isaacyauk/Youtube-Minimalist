@@ -4,20 +4,20 @@ Thanks for checking out the YouTube Minimalist extension. I'm so glad that you'r
 As a result, I have written this simple extension: YouTube Minimalist helps users maintain focus and productivity by creating a cleaner, more intentional browsing experience. This extension addresses YouTube's attention-grabbing issues in it's interface by simplifying the layout and removing distracting elements.
 
 # Key Features
-  • Redirects to your Subscriptions page, ensuring you see content only from creators you've chosen to follow
-  • Hide algorithmic recommendations, Shorts, and "Watch Next" suggestions to discourage infinite scrolling
-  • Hides comment sections and tertiary navigation elements
-  • Disables infinite scroll via a page refresh and an excessive use alert
-  • Applies clean, minimalist styling across site to encourage productivity and focus
+  - Redirects to your Subscriptions page, ensuring you see content only from creators you've chosen to follow
+  - Hide algorithmic recommendations, Shorts, and "Watch Next" suggestions to discourage infinite scrolling
+  - Hides comment sections and tertiary navigation elements
+  - Disables infinite scroll via a page refresh and an excessive use alert
+  - Applies clean, minimalist styling across site to encourage productivity and focus
 
 # Installiation: 
 If you're running this locally, the steps to get this running are quite simple:
-  • Clone this project to your device
-  • Navigate to your chrome://extensions/
-  • Turn on the "Developer Mode" switch if you haven't already
-  • Click on the "Load Unpacked" button in the top left of your screen
-  • Navigate to wherever you cloned project and select it
-  • You're done! Now it will behave like any other extension you have.
+  - Clone this project to your device
+  - Navigate to your chrome://extensions/ page
+  - Turn on the "Developer Mode" switch if you haven't already
+  - Click on the "Load Unpacked" button in the top left of your screen
+  - Navigate to wherever you cloned project and select it
+  - You're done! Now it will behave like any other extension you have.
 
 # Notes
 I know you might be wondering: why does this exist? Aren't there better tools already made out there? 
